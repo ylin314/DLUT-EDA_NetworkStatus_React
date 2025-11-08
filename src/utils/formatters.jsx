@@ -18,44 +18,31 @@ export function formatFee(fee) {
 }
 
 export function checkUserAgent(UserAgent) {
-  var mobileKeywords = ["Windows Phone", "MQQBrowser"];
+  const DEVICE_TYPES = {
+    'Windows NT': 'Windows',
+    'Android': 'Android',
+    'iPhone': 'iOS',
+    'iPod': 'iOS',
+    'iPad': 'iPadOS',
+    'Macintosh': 'macOS',
+    'Linux': 'Linux'
+  };
+  const mobileKeywords = ['Windows Phone', 'MQQBrowser'];
 
-  if (UserAgent.includes("Windows NT")) {
-    return "Windows";
+  if (UserAgent.includes('OpenHarmony') || UserAgent.includes('HarmonyOS')) {
+    if (UserAgent.includes('Phone')) return '华为手机';
+    if (UserAgent.includes('Tablet')) return '华为平板';
+    if (UserAgent.includes('PC')) return '华为 2in1';
+    return '遥遥领先';
   }
-  if (UserAgent.includes("OpenHarmony") || UserAgent.includes("HarmonyOS")) {
-    if (UserAgent.includes("Phone")) {
-      return "华为手机";
-    }
-    if (UserAgent.includes("Tablet")) {
-      return "华为平板";
-    }
-    if (UserAgent.includes("PC")) {
-      return "华为 2in1";
-    }
-    else {
-      return "遥遥领先";
-    }
+
+  for (const [keyword, type] of Object.entries(DEVICE_TYPES)) {
+    if (UserAgent.includes(keyword)) return type;
   }
-  if (UserAgent.includes("Android")) {
-    return "Android";
+
+  if (mobileKeywords.some(keyword => UserAgent.includes(keyword))) {
+    return '移动终端';
   }
-  if (UserAgent.includes("iPhone") || UserAgent.includes("iPod")) {
-    return "iOS";
-  }
-  if (UserAgent.includes("iPad")) {
-    return "iPadOS";
-  }
-  if (UserAgent.includes("Macintosh")) {
-    return "macOS";
-  }
-  if (UserAgent.includes("Linux")) {
-    return "Linux";
-  }
-  for (var i = 0; i < mobileKeywords.length; i++) {
-    if (UserAgent.includes(mobileKeywords[i])) {
-      return "移动终端";
-    }
-  }
-  return "未知设备";
+
+  return '未知设备';
 }

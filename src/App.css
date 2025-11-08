@@ -110,7 +110,7 @@ button {
   cursor: pointer;
   background-color: #4CAF50;
   border: none;
-  color: white;
+  color: white !important;
   border-radius: 10px;
   transition: background-color 0.3s;
   flex: 0 1 auto;

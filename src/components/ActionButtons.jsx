@@ -1,6 +1,6 @@
 import { Modal } from "antd";
 
-function ActionButtons({ data, onRefresh }) {
+function ActionButtons({ onRefresh }) {
   const handleLogin = () => {
     fetch('http://172.20.30.1/drcom/chkstatus?callback=')
       .then(response => response.arrayBuffer())

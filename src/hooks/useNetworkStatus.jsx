@@ -3,7 +3,6 @@ import { formatBytes, formatMacAddress, formatFee, checkUserAgent } from '../uti
 
 export function useNetworkStatus() {
   const [data, setData] = useState(null);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const loadData = useCallback(() => {
@@ -16,7 +15,6 @@ export function useNetworkStatus() {
         result: 0,
         onlineStatus: '未连接到校园网'
       });
-      setError('');
       setIsLoading(false);
       return;
     }
@@ -50,15 +48,13 @@ export function useNetworkStatus() {
           v4ip: parsedData.v4ip,
           v46ip: parsedData.v46ip
         };
-
-        // console.log(formattedData)
-
         setData(formattedData);
-        setError('');
       })
-      .catch(err => {
-        setError(`加载失败, 请检查是否处于校园网环境:${err.message || err}`);
-        setData(null);
+      .catch(() => {
+        setData({
+          result: 0,
+          onlineStatus: `未连接到校园网`
+        });
       })
       .finally(() => {
         setIsLoading(false);
@@ -71,5 +67,5 @@ export function useNetworkStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  return { data, error, loadData };
+  return { data, loadData };
 }
