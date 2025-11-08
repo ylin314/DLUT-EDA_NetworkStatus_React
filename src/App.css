@@ -1,0 +1,151 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-image: url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#errorMsg {
+  font-size: 15px;
+  color: red;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 28.5px;
+  font-weight: bold;
+  margin: 15px;
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+  padding-top: 5px;
+}
+
+.table-container {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 25px 10px 5px;
+  border-radius: 10px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+table {
+  border-collapse: collapse;
+  width: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  text-align: left;
+  user-select: none;
+}
+
+td:nth-child(2) {
+  min-width: 125px;
+}
+
+th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(242, 242, 242, 0.4);
+}
+
+tr:nth-child(odd) {
+  background-color: rgba(242, 242, 242, 0.6);
+}
+
+tr:hover {
+  background-color: rgba(221, 221, 221, 0.7);
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1px;
+  padding: 10px;
+  width: auto;
+  max-width: 320px;
+  margin-top: 5px;
+}
+
+button {
+  margin: 8px;
+  padding: 12px 20px;
+  font-size: 17px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+  flex: 0 1 auto;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.footer {
+  line-height: 1.1;
+  position: relative;
+  text-align: center;
+  font-size: 13.5px;
+  color: #555;
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0 5px 5px;
+}
+
+.extra-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+/* 手机端不显示 */
+@media screen and (max-width: 768px) {
+  .sakana-float {
+    display: none !important;
+  }
+}
+
+.footer a:visited {
+  color: blue;
+}

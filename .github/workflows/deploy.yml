@@ -1,0 +1,60 @@
+name: Deploy to NAOSI-Server
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Configure Git Proxy
+        run: |
+          echo "Testing proxy connectivity..."
+          if nc -z -w1 192.168.5.3 10808; then
+            echo "Proxy reachable, setting git proxy"
+            git config --global http.proxy http://192.168.5.3:10808
+            git config --global https.proxy http://192.168.5.3:10808
+          else
+            echo "Proxy unreachable, unsetting git proxy"
+            git config --global --unset http.proxy || true
+            git config --global --unset https.proxy || true
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Setup SSH key and known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p $DEPLOY_PORT $DEPLOY_HOST >> ~/.ssh/known_hosts
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+
+      - name: Deploy files via SCP
+        run: |
+          set -e
+          ssh -i ~/.ssh/deploy_key -p $DEPLOY_PORT $DEPLOY_USER@$DEPLOY_HOST "rm -rf $DEPLOY_PATH/*"
+          scp -i ~/.ssh/deploy_key -P $DEPLOY_PORT -r ./dist/* $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
