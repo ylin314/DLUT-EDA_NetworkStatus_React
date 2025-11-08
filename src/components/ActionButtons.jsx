@@ -1,4 +1,4 @@
-import React from 'react';
+import { Modal } from "antd";
 
 function ActionButtons({ data, onRefresh }) {
   const handleLogin = () => {
@@ -32,9 +32,22 @@ function ActionButtons({ data, onRefresh }) {
     window.open(selfServiceUrl, '_blank');
   };
 
+
   const handleLogout = () => {
-    alert('单击确定后注销当前校园网账号,但请不要在新弹出的窗口进行登录操作,请重新进入172.20.30.3进行登录!如提示500-内部错误,请重新登录后注销!');
-    window.open('http://172.20.30.2:8080/Self/login/logout', '_blank');
+    Modal.confirm({
+      title: "注销确认",
+      content: (
+        <div>
+          单击确定后注销当前校园网账号，但请不要在新弹出的窗口进行登录操作，
+          请重新进入 172.20.30.3 进行登录！如提示 500-内部错误，请重新登录后注销！
+        </div>
+      ),
+      okText: "确定",
+      cancelText: "取消",
+      onOk: () => {
+        window.open('http://172.20.30.2:8080/Self/login/logout', '_blank');
+      },
+    });
   };
 
   return (
