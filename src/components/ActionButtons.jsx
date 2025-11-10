@@ -1,4 +1,4 @@
-import { Modal } from "antd";
+import { Modal, message } from "antd";
 
 function ActionButtons({ onRefresh }) {
   const handleLogin = () => {
@@ -23,7 +23,8 @@ function ActionButtons({ onRefresh }) {
         window.open(loginUrl, '_blank');
       })
       .catch(err => {
-        console.error('获取IP失败:', err);
+        message.error(`获取IP失败: 未连接校园网或代理服务器有问题`);
+        console.error('获取IP失败: ', err);
       });
   };
 
