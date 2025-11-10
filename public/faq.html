@@ -88,11 +88,11 @@
 -->
   <main>
     <h2>校园网常见问题</h2>
-    <p style="text-align:center; font-size:0.9em; color:#666; margin-top:0.2em;"> 本页面内容由 NAOSI 维护，若遇到未在本页列出的问题，请联系<strong>开发区校区网络服务办公室</strong>解决。 </p>
+    <p style="text-align:center; font-size:0.9em; color:#666; margin-top:0.2em;"> 本页面内容由大连理工大学 NAOSI 网络与开源协会维护，若遇到未在本页列出的问题，请联系<strong>开发区校区网络服务办公室</strong>解决。 </p>
     <hr>
-    <p><strong>Q:</strong> 已经登录校园网账号，但仍无法连接网络，“用户自助服务系统”中未显示当前设备在线信息，怎么办？</p>
+    <p><strong>Q1:</strong> 已经登录校园网账号，但仍无法连接网络，“用户自助服务系统”中未显示当前设备在线信息，怎么办？</p>
     <img src="./faq_assets/faq1.jpg" alt="FAQ1">
-    <p><strong>A:</strong> 这种情况一般是仅登录了用户自助服务系统，实际上当前设备并未成功登录校园网。解决方法为：</p>
+    <p><strong>A1:</strong> 这种情况一般是仅登录了用户自助服务系统，实际上当前设备并未成功登录校园网。解决方法为：</p>
     <ol>
       <li><strong>法一：</strong>点击"注销登录"按钮后，访问 <a href="http://172.20.30.3/" target="_blank">http://172.20.30.3/</a> 重新登录；<br>
         <img src="./faq_assets/faq2.jpg" alt="FAQ2">
@@ -100,11 +100,11 @@
       <li><strong>法二：</strong>直接清除浏览器 cookie 后重新登录。</li>
     </ol>
     <hr>
-    <p><strong>Q:</strong> “用户自助服务系统”里账户余额明明不是 0 元，为什么无法上网？</p>
-    <p><strong>A:</strong> 不要看账户余额，看可用流量还剩多少，如果还剩 0M 那就是当月流量已耗尽。想继续用只能再充钱（超出部分 1 元 1GB，充钱后流量自动入账），到下个自然月重置）。</p>
+    <p><strong>Q2:</strong> “用户自助服务系统”里账户余额明明不是 0 元，为什么无法上网？</p>
+    <p><strong>A2:</strong> 不要看账户余额，看可用流量还剩多少，如果还剩 0M 那就是当月流量已耗尽。想继续用只能再充钱（超出部分 1 元 1GB，充钱后流量自动入账），到下个自然月重置）。</p>
     <hr>
-    <p><strong>Q:</strong> “用户自助服务系统”里可用流量明明不是 0M，为什么仍然无法上网？</p>
-    <p><strong>A:</strong> 可能是因为账户余额不足（为 0 元）。如果充钱之后又出现了无法上网的问题，可能是因为当前计费方式不是按月计费。</p>
+    <p><strong>Q3:</strong> “用户自助服务系统”里可用流量明明不是 0M，为什么仍然无法上网？</p>
+    <p><strong>A3:</strong> 可能是因为账户余额不足（为 0 元）。如果充钱之后又出现了无法上网的问题，可能是因为当前计费方式不是按月计费。</p>
     <p>开发区校区校园网无法显式切换计费方式，当月采用哪种计费方式主要由账户余额决定，以下是校园网计费规则：</p>
     <ol>
       <li>余额 ≥ 20 元，且当月流量 ≤ 150G：正常使用，每月扣 20 元月租。</li>
@@ -113,41 +113,34 @@
       <li>余额 A ＜ 20 元且流量 ＞ 150G：每天凌晨系统结算，当余额 A ＜ (0.67×天数 + n) 时账号临停。充值 N 元后恢复，系统结算后余额为 a = A + N - 0.67×天数 - n，若 a ＞ 0.67，当天可上网，可用流量约为 a - 0.67，次日凌晨系统继续按 0.67 元/天扣费。</li>
     </ol>
     <hr>
-    <p><strong>Q:</strong> 为什么插上网线之后我的电脑就断网了？</p>
-    <p><strong>A:</strong> 连接网线后设备 MAC 地址发生变化，断网是正常现象，重新登录校园网即可。</p>
+    <p><strong>Q4:</strong> 为什么插上网线之后我的电脑就断网了？</p>
+    <p><strong>A4:</strong> 连接网线后设备 MAC 地址发生变化，断网是正常现象，重新登录校园网即可。</p>
     <hr>
-    <p><strong>Q:</strong> 连接了校园网但是访问不了网页，浏览器提示如图所示（错误代码通常为 ERR_PROXY_CONNECTION_FAILED），怎么办？</p>
+    <p><strong>Q5:</strong> 连接了校园网但是访问不了网页，浏览器提示如图所示（错误代码通常为 ERR_PROXY_CONNECTION_FAILED），怎么办？</p>
     <img src="./faq_assets/proxy1.jpg" alt="代理提示示例1" style="max-width:40%;height:auto;margin-right:1rem;">
-    <p><strong>A:</strong> 一般是因为之前使用过代理工具并且非正常关闭（比如未关闭代理就直接关机），导致 Windows 系统代理设置被修改，从而影响上网。解决办法为，重新打开代理工具然后正常关闭来恢复系统代理设置，或在 Windows 设置里搜索并运行“网络重置”然后重启电脑。</p>
+    <p><strong>A5:</strong> 一般是因为之前使用过代理工具并且非正常关闭（比如未关闭代理就直接关机），导致 Windows 系统代理设置被修改，从而影响上网。解决办法为，重新打开代理工具然后正常关闭来恢复系统代理设置，或在 Windows 设置里搜索并运行“网络重置”然后重启电脑。</p>
+    <p>如果您无法理解上述教程，可使用脚本进行处理：<a href="http://172.20.30.3/network_reset.bat" download>Windows</a> <a href="http://172.20.30.3/network_reset.sh" download>macOS</a> <a href="http://172.20.30.3/network_reset_linux.sh" download>Linux</a></p>
     <hr>
-    <p><strong>Q:</strong> 连接了校园网但是访问不了网页，浏览器提示如图所示（错误代码通常为 DNS_PROBE_FINISHED_NO_INTERNET），怎么办？</p>
+    <p><strong>Q6:</strong> 连接了校园网但是访问不了网页，浏览器提示如图所示（错误代码通常为 DNS_PROBE_FINISHED_NO_INTERNET），怎么办？</p>
     <img src="./faq_assets/dns1.jpg" alt="DNS提示示例1" style="max-width:45%;height:auto;margin-right:1rem;">
-    <p><strong>A:</strong> 该问题是 DNS 非自动获取造成的。解决办法为，打开控制面板 -> 网络和共享中心 -> 活动网络 -> 属性，在 IPv4 设置中，将 IP 地址和 DNS 服务器地址均设置为“自动获得”，保存设置即可（IPv6 同理，不过一般遇不到这问题）。</p>
+    <p><strong>A6:</strong> 该问题是 DNS 非自动获取造成的。解决办法为，打开控制面板 -> 网络和共享中心 -> 活动网络 -> 属性，在 IPv4 设置中，将 IP 地址和 DNS 服务器地址均设置为“自动获得”，保存设置即可（IPv6 同理，不过一般遇不到这问题）。</p>
     <img src="./faq_assets/dns2.jpg" alt="DNS2">
+    <p>如果您无法理解上述教程，可使用脚本进行处理：<a href="http://172.20.30.3/network_reset.bat" download>Windows</a> <a href="http://172.20.30.3/network_reset.sh" download>macOS</a> <a href="http://172.20.30.3/network_reset_linux.sh" download>Linux</a></p>
     <hr>
-    <p><strong>Q:</strong> 为什么别人的网速可以到 ×× MB/s，我的不行？</p>
-    <p><strong>A:</strong> 现在开发区校区校园网在<strong>有线</strong>连接时，正常情况下协商速度应为 1.0Gbps，如无法达到该速度，请联系校区网络服务办公室进行报障。无线连接受限于硬件条件，网速一般不会太快，属于正常现象。</p>
+    <p><strong>Q7:</strong> 在人员密集区域（如教学楼 C-101 教室）为什么连不上校园网？</p>
+    <p><strong>A7:</strong> 当前区域的无线 AP 所能分配的 IP 地址已达上限，除非增加硬件，否则没有解决办法，等人少了就好了。</p>
     <hr>
-    <p><strong>Q:</strong> 在人员密集区域（如教学楼 C-101 教室）为什么连不上校园网？</p>
-    <p><strong>A:</strong> 当前区域的无线 AP 所能分配的 IP 地址已达上限，除非增加硬件，否则没有解决办法，等人少了就好了。</p>
+    <p><strong>Q8:</strong> 网费充错校区了怎么办？</p>
+    <p><strong>A8:</strong> 请拨打电话 <a href="tel:0411-84707007">0411-84707007</a> 咨询，下次充网费记得看清楚再充。</p>
     <hr>
-    <p><strong>Q:</strong> 我网费充错校区了怎么办？</p>
-    <p><strong>A:</strong> 请拨打电话0411-84707007咨询，下次充网费记得看清楚再充。</p>
-    <hr>
-    <p><strong>Q:</strong> 我的i大工账号/校园邮箱账户/图书馆账户有问题登不上去，该向谁反映问题？</p>
-    <p><strong>A:</strong> 开发区校区网络服务办公室仅负责校区网络维护。涉及到大工公共网络资源的，请直接联系大连理工大学网络与信息化中心（办公地点在凌水校区，联系邮箱为 <a href="mailto:its@dlut.edu.cn">its@dlut.edu.cn</a>）。</p>
-    <hr>
-    <p><strong>Q:</strong> 我电信/移动/联通/广电校园卡怎么这么慢，是不是学校的问题？</p>
-    <p><strong>A:</strong> 所谓的“校园卡”是各运营商提供的学生优惠<strong>流量卡</strong>，与大连理工大学无关。该卡无法直接使用校内网络资源，不受学校网信中心管控。遇到问题请咨询对应运营商客服。</p>
-    <hr>
-    <p><strong>Q:</strong> 电脑无法正常同步时间是为什么？</p>
-    <p><strong>A:</strong> 大连理工大学校园网阻断了外部 IPv4 NTP 流量，而大工的 NTP 服务器（time.dlut.edu.cn）在校园网 IPv4 或 IPv6 连接下同步时间都是正常的。建议在电脑系统设置内更换 NTP 服务器地址为 time.dlut.edu.cn。如需在校园网环境中使用外部 NTP 服务器，需要有 IPv6 网络连接。</p>
+    <p><strong>Q9:</strong> i大工账号/校园邮箱账户/图书馆账户有问题登不上去，该向谁反映问题？</p>
+    <p><strong>A9:</strong> 开发区校区网络服务办公室仅负责校区网络维护。涉及到大工公共网络资源的，请直接联系大连理工大学网络与信息化中心（办公地点在凌水校区，联系电话 <a href="tel:0411-84707014">0411-84707014</a>，联系邮箱 <a href="mailto:its@dlut.edu.cn">its@dlut.edu.cn</a>）。</p>
   </main>
-  <!-- 
+  
   <footer>
     &copy; 2025 校园网 FAQ
   </footer>
-  -->
+ 
 </body>
 
 </html>
