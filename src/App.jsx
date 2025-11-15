@@ -18,7 +18,7 @@ function App() {
         <h2>本机校园网状态</h2>
         <div className="table-container">
           <NetworkTable data={data} />
-          <ActionButtons onRefresh={handleRefresh} />
+          <ActionButtons onRefresh={handleRefresh} data={data} />
         </div>
       </div>
       <Footer />

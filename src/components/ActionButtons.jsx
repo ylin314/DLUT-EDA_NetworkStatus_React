@@ -1,7 +1,16 @@
 import { Modal, message } from "antd";
 
-function ActionButtons({ onRefresh }) {
+function ActionButtons({ onRefresh, data }) {
   const handleLogin = () => {
+    if (data?.onlineStatus === '在线') {
+      Modal.warning({
+        title: '无需登录',
+        content: '已登录校园网',
+        okText: '确定',
+      });
+      return;
+    }
+
     fetch('http://172.20.30.1/drcom/chkstatus?callback=')
       .then(response => response.arrayBuffer())
       .then(arrayBuffer => {
@@ -29,18 +38,38 @@ function ActionButtons({ onRefresh }) {
   };
 
   const handleSelfService = () => {
+    // 检查在线状态
+    if (data?.onlineStatus !== '在线') {
+      Modal.warning({
+        title: '无法访问账户明细',
+        content: '未登录校园网',
+        okText: '确定',
+      });
+      return;
+    }
+
     const selfServiceUrl = 'https://sso.dlut.edu.cn/cas/login?service=http%3A%2F%2F172.20.30.2%3A8080%2FSelf%2Fsso_login';
     window.open(selfServiceUrl, '_blank');
   };
 
 
   const handleLogout = () => {
+    // 检查在线状态
+    if (data?.onlineStatus !== '在线') {
+      Modal.warning({
+        title: '无法注销',
+        content: '未登录校园网',
+        okText: '确定',
+      });
+      return;
+    }
+
     Modal.confirm({
       title: "注销确认",
       content: (
         <div>
-          单击确定后注销当前校园网账号，但请不要在新弹出的窗口进行登录操作，
-          请重新进入 172.20.30.3 进行登录！如提示 500-内部错误，请重新登录后注销！
+          单击确定后注销当前校园网账号，但请不要在新弹出的窗口进行登录操作，请重新进入 172.20.30.3 进行登录！
+          如提示 500-内部错误，请点击“账户明细”假装进行一次登录后再注销！
         </div>
       ),
       okText: "确定",
