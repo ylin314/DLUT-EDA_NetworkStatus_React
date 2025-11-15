@@ -12,14 +12,31 @@ jobs:
       - name: Configure Git Proxy
         run: |
           echo "Testing proxy connectivity..."
-          if nc -z -w1 192.168.5.3 10808; then
-            echo "Proxy reachable, setting git proxy"
-            git config --global http.proxy http://192.168.5.3:10808
-            git config --global https.proxy http://192.168.5.3:10808
-          else
-            echo "Proxy unreachable, unsetting git proxy"
-            git config --global --unset http.proxy || true
-            git config --global --unset https.proxy || true
+
+          proxies_to_check=(
+              "192.168.5.3 10808"
+              "100.126.198.53 10808"
+              "100.109.233.56 10808"
+          )
+
+          proxy_set=false
+
+          for proxy_info in "${proxies_to_check[@]}"; do
+              read -r host port <<< "$proxy_info"
+              echo "Checking proxy: $host:$port..."
+              if nc -z -w1 "$host" "$port"; then
+                  echo "Proxy $host:$port reachable, setting git proxy"
+                  git config --global http.proxy "http://$host:$port"
+                  git config --global https.proxy "http://$host:$port"
+                  proxy_set=true
+                  break
+              fi
+          done
+
+          if [ "$proxy_set" = false ]; then
+              echo "All proxies unreachable, unsetting git proxy"
+              git config --global --unset http.proxy || true
+              git config --global --unset https.proxy || true
           fi
 
       - name: Checkout repository
