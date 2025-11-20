@@ -83,7 +83,7 @@ function ActionButtons({ onRefresh, data }) {
   return (
     <div className="button-container">
       <button id="loginBtn" onClick={handleLogin}>跳转登录</button>
-      <button id="logoutBtn" onClick={handleLogout}>注销本机</button>
+      <button id="logoutBtn" onClick={handleLogout}>注销登录</button>
       <button id="selfServiceBtn" onClick={handleSelfService}>账户明细</button>
       <button id="refreshBtn" onClick={onRefresh}>刷新数据</button>
     </div>
