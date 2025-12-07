@@ -1,6 +1,6 @@
 import { Modal, message } from "antd";
 
-function ActionButtons({ onRefresh, data }) {
+function ActionButtons({ data }) {
   const openWindowWithFallback = (url) => {
     const newWindow = window.open(url, '_blank');
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
@@ -99,12 +99,29 @@ function ActionButtons({ onRefresh, data }) {
     });
   };
 
+  const handlePay = () => {
+    Modal.confirm({
+      title: "校区确认",
+      content: (
+        <div>
+          充值网费时请注意选择开发区校区！
+        </div>
+      ),
+      okText: "确定",
+      cancelText: "取消",
+      onOk: () => {
+        const payUrl = 'http://ecardpayment.dlut.edu.cn/';
+        openWindowWithFallback(payUrl);
+      },
+    });
+  }
+
   return (
     <div className="button-container">
       <button id="loginBtn" onClick={handleLogin}>跳转登录</button>
       <button id="logoutBtn" onClick={handleLogout}>注销登录</button>
       <button id="selfServiceBtn" onClick={handleSelfService}>账户明细</button>
-      <button id="refreshBtn" onClick={onRefresh}>刷新数据</button>
+      <button id="payBtn" onClick={handlePay}>网费充值</button>
     </div>
   );
 }
