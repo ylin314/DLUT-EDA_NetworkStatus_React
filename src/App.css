@@ -196,3 +196,14 @@ button:hover {
   from { opacity: 0; transform: translateY(-100%); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.status-online {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.status-offline {
+  color: #c62828;
+  font-weight: 700;
+}
+
