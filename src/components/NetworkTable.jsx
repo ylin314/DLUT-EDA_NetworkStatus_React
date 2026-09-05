@@ -4,7 +4,12 @@ function NetworkTable({ data }) {
       <tbody>
         <tr>
           <th>登录状态</th>
-          <td id="onlineStatus">{data?.onlineStatus || '-'}</td>
+          <td
+            id="onlineStatus"
+            className={data?.onlineStatus === "在线" ? "status-online" : data?.onlineStatus ? "status-offline" : undefined}
+          >
+            {data?.onlineStatus || "-"}
+          </td>
         </tr>
         <tr>
           <th>账号</th>
