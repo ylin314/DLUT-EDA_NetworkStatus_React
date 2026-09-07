@@ -52,42 +52,52 @@ h2 {
   border-radius: 10px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
   margin-bottom: 10px;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-table {
+
+.status-table {
   border-collapse: collapse;
-  width: auto;
+  width: 340px;
   margin: 0 auto;
   border-radius: 10px;
   overflow: hidden;
+  /* 固定列宽，避免 reveal 切换文本长度时整列宽度跳动 */
+  table-layout: fixed;
 }
 
-th, td {
+.status-table th,
+.status-table td {
   border: 1px solid #ddd;
   padding: 8px 16px;
-  text-align: left;
   user-select: none;
 }
 
-td:nth-child(2) {
-  min-width: 125px;
+.status-table td {
+  text-align: left;
 }
 
-th {
+.status-table th {
   text-align: center;
   vertical-align: middle;
+  width: 120px;
 }
 
-tr:nth-child(even) {
+.status-table td:nth-child(2) {
+  width: 220px;
+}
+
+.status-table tr:nth-child(even) {
   background-color: rgba(242, 242, 242, 0.4);
 }
 
-tr:nth-child(odd) {
+.status-table tr:nth-child(odd) {
   background-color: rgba(242, 242, 242, 0.6);
 }
 
-tr:hover {
+.status-table tr:hover {
   background-color: rgba(221, 221, 221, 0.7);
 }
 
@@ -119,6 +129,38 @@ button {
 
 button:hover {
   background-color: #45a049;
+}
+
+.reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1em;
+  min-width: 0;
+  height: 1rem;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.reveal-btn:hover {
+  background: transparent;
+}
+
+.info-value-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.info-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .footer {
