@@ -40,12 +40,21 @@ fi
 # =================================================================
 if [ "$EUID" -ne 0 ]; then 
     echo "正在请求管理员权限..."
-    if ! sudo "$0" "$@"; then
+    if ! sudo env \
+        NETWORK_RESET_USER="$USER" \
+        NETWORK_RESET_HOME="$HOME" \
+        NETWORK_RESET_DISPLAY="${DISPLAY:-}" \
+        NETWORK_RESET_DBUS="${DBUS_SESSION_BUS_ADDRESS:-}" \
+        "$0" "$@"; then
         echo -e "${RED}错误：无法获取管理员权限${NC}"
         exit 1
     fi
     exit $?
 fi
+
+# 提权后仍然针对原始桌面用户修改代理设置，而不是误操作 root 的配置。
+TARGET_USER="${NETWORK_RESET_USER:-${SUDO_USER:-root}}"
+TARGET_HOME="${NETWORK_RESET_HOME:-$(getent passwd "$TARGET_USER" | cut -d: -f6)}"
 
 # =================================================================
 # 检测网络管理工具
@@ -80,7 +89,8 @@ main() {
     echo "正在清除系统代理..."
     echo "-----------------------------------------------------------------"
     
-    # 清除环境变量中的代理设置
+    # 避免本脚本后续执行的网络命令继续使用当前进程继承的代理。
+    # shell 环境变量无法由子进程永久修改；若用户写入了 shell 配置，需自行删除对应配置。
     unset http_proxy
     unset https_proxy
     unset ftp_proxy
@@ -93,13 +103,19 @@ main() {
     # 清除GNOME代理设置（如果存在）
     if command -v gsettings &> /dev/null; then
         echo "正在清除 GNOME 代理设置..."
-        gsettings set org.gnome.system.proxy mode 'none' 2>/dev/null || echo -e "${YELLOW}警告：清除GNOME代理失败${NC}"
+        sudo -u "$TARGET_USER" env \
+            HOME="$TARGET_HOME" \
+            DISPLAY="${NETWORK_RESET_DISPLAY:-}" \
+            DBUS_SESSION_BUS_ADDRESS="${NETWORK_RESET_DBUS:-}" \
+            gsettings set org.gnome.system.proxy mode 'none' 2>/dev/null || \
+            echo -e "${YELLOW}警告：清除GNOME代理失败${NC}"
     fi
     
     # 清除KDE代理设置（如果存在）
-    if [ -f "$HOME/.config/kioslaverc" ]; then
+    if [ -f "$TARGET_HOME/.config/kioslaverc" ]; then
         echo "正在清除 KDE 代理设置..."
-        sed -i '/ProxyType/d' "$HOME/.config/kioslaverc" 2>/dev/null || echo -e "${YELLOW}警告：清除KDE代理失败${NC}"
+        sed -i '/ProxyType/d' "$TARGET_HOME/.config/kioslaverc" 2>/dev/null || echo -e "${YELLOW}警告：清除KDE代理失败${NC}"
+        chown "$TARGET_USER" "$TARGET_HOME/.config/kioslaverc" 2>/dev/null || true
     fi
     
     echo -e "${GREEN}系统代理已清除。${NC}"

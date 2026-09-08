@@ -19,7 +19,29 @@ npm run build
 
 # 预览生产构建
 npm run preview
+
+# 运行代码检查
+npm run lint
+
+# 运行单元测试
+npm test
 ```
+
+## 部署说明
+
+- 项目构建后是纯静态站点，不需要后端服务或数据库。
+- 校园网状态、登录和注销依赖校内地址 `172.20.30.1`、`172.20.30.2`，应部署在校园网内可访问的位置。
+- 页面运行时不依赖 CDN；React、Ant Design、Sakana Widget、背景图和 FAQ 资源均由本项目本地构建或随静态文件部署。
+- `public/background` 中的图片会在开发和生产构建时自动写入背景索引，无需手工维护 JSON。
+
+## 主要目录
+
+- `src/services`：校园网状态请求、响应解析和认证地址构造。
+- `src/hooks`：状态轮询和随机背景加载。
+- `src/components`：状态表格、操作按钮、页脚和 Sakana Widget。
+- `src/utils`：格式化与脱敏等纯函数。
+- `public`：FAQ、修复脚本、背景图片及其他本地静态资源。
+- `test`：Node.js 内置测试运行器执行的单元测试。
 
 ## 功能特性
 

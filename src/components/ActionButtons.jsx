@@ -1,60 +1,79 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Modal, message } from "antd";
+import {
+  SELF_LOGOUT_URL,
+  buildLoginUrl,
+  buildSelfServiceUrl,
+  fetchDrcomStatus,
+} from "../services/campusNetwork";
 
 const AUTH_WINDOW_NAME = "dlutCampusAuth";
-const SELF_LOGOUT_URL = "http://172.20.30.2:8080/Self/login/logout";
-const SELF_SSO_URL = "https://sso.dlut.edu.cn/cas/login?service=http%3A%2F%2F172.20.30.2%3A8080%2FSelf%2Fsso_login";
-const LOGOUT_FAILED_URL = "/logout-failed.html";
+const SELF_SSO_URL = buildSelfServiceUrl();
+const LOGOUT_FAILED_URL = `${import.meta.env.BASE_URL}logout-failed.html`;
 const LOGOUT_HOP_MS = 600;
 const LOGIN_WAIT_WARNING_MS = 25000;
 const LOGOUT_CHECK_TIMEOUT_MS = 2500;
 const LOGOUT_CHECK_INTERVAL_MS = 400;
 
-function buildLoginUrl(ip) {
-  return `https://sso.dlut.edu.cn/cas/login?service=http%3A%2F%2F172.20.30.2%3A8080%2FSelf%2Fsso_login%3Fwlan_user_ip%3D${ip}%26authex_enable%3D%26type%3D1`;
-}
-
-function parseDrcomPayload(arrayBuffer) {
-  const text = new TextDecoder("gbk").decode(arrayBuffer);
-  return JSON.parse("{" + text.split("({")[1].split("})")[0] + "}");
-}
-
-function fetchDrcomStatus() {
-  return fetch("http://172.20.30.1/drcom/chkstatus?callback=")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`${response.status} ${response.statusText}`);
-      }
-      return response.arrayBuffer();
-    })
-    .then(parseDrcomPayload);
-}
-
-function waitUntilLoggedOut(timeoutMs = LOGOUT_CHECK_TIMEOUT_MS, intervalMs = LOGOUT_CHECK_INTERVAL_MS) {
+function waitUntilLoggedOut({
+  signal,
+  timeoutMs = LOGOUT_CHECK_TIMEOUT_MS,
+  intervalMs = LOGOUT_CHECK_INTERVAL_MS,
+} = {}) {
   const startedAt = Date.now();
   return new Promise((resolve) => {
+    let settled = false;
+    let timer = null;
+
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      if (timer) window.clearTimeout(timer);
+      signal?.removeEventListener("abort", handleAbort);
+      resolve(result);
+    };
+
+    const handleAbort = () => finish(false);
+
     const tick = () => {
-      fetchDrcomStatus()
+      if (signal?.aborted) {
+        finish(false);
+        return;
+      }
+
+      const remainingMs = timeoutMs - (Date.now() - startedAt);
+      if (remainingMs <= 0) {
+        finish(false);
+        return;
+      }
+
+      fetchDrcomStatus({ signal, timeoutMs: Math.min(1000, remainingMs) })
         .then((payload) => {
           if (payload.result !== 1) {
-            resolve(true);
+            finish(true);
             return;
           }
           if (Date.now() - startedAt >= timeoutMs) {
-            resolve(false);
+            finish(false);
             return;
           }
-          window.setTimeout(tick, intervalMs);
+          timer = window.setTimeout(tick, intervalMs);
         })
         .catch(() => {
-          if (Date.now() - startedAt >= timeoutMs) {
-            resolve(false);
+          if (signal?.aborted) {
+            finish(false);
             return;
           }
-          window.setTimeout(tick, intervalMs);
+          if (Date.now() - startedAt >= timeoutMs) {
+            finish(false);
+            return;
+          }
+          timer = window.setTimeout(tick, intervalMs);
         });
     };
-    window.setTimeout(tick, intervalMs);
+
+    signal?.addEventListener("abort", handleAbort, { once: true });
+    timer = window.setTimeout(tick, intervalMs);
   });
 }
 
@@ -89,8 +108,10 @@ function writePreparingPage(win, title, hint) {
 }
 
 function ActionButtons({ data }) {
-  const [awaitingLogin, setAwaitingLogin] = useState(false);
+  const awaitingLoginRef = useRef(false);
   const warningTimerRef = useRef(null);
+  const operationControllerRef = useRef(null);
+  const navigationTimersRef = useRef(new Set());
 
   const clearWarningTimer = () => {
     if (warningTimerRef.current) {
@@ -99,16 +120,35 @@ function ActionButtons({ data }) {
     }
   };
 
+  const clearNavigationTimers = () => {
+    navigationTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    navigationTimersRef.current.clear();
+  };
+
+  const beginOperation = () => {
+    awaitingLoginRef.current = false;
+    clearWarningTimer();
+    operationControllerRef.current?.abort();
+    clearNavigationTimers();
+    const controller = new AbortController();
+    operationControllerRef.current = controller;
+    return controller;
+  };
+
   useEffect(() => {
-    if (!awaitingLogin) return;
-    if (data?.onlineStatus === "在线") {
+    if (awaitingLoginRef.current && data?.onlineStatus === "在线") {
       message.success({ content: "校园网已登录", key: "campus-login" });
-      setAwaitingLogin(false);
+      awaitingLoginRef.current = false;
       clearWarningTimer();
     }
-  }, [awaitingLogin, data?.onlineStatus]);
+  }, [data?.onlineStatus]);
 
-  useEffect(() => () => clearWarningTimer(), []);
+  useEffect(() => () => {
+    awaitingLoginRef.current = false;
+    clearWarningTimer();
+    clearNavigationTimers();
+    operationControllerRef.current?.abort();
+  }, []);
 
   const showPopupBlocked = (url) => {
     Modal.warning({
@@ -154,7 +194,7 @@ function ActionButtons({ data }) {
     }
   };
 
-  const hopAuthWindow = (authWindow, urls) => {
+  const hopAuthWindow = (authWindow, urls, signal) => {
     if (!authWindow || !urls.length) {
       return false;
     }
@@ -162,27 +202,26 @@ function ActionButtons({ data }) {
       return false;
     }
     urls.slice(1).forEach((url, index) => {
-      window.setTimeout(() => {
-        navigateAuthWindow(authWindow, url);
+      const timer = window.setTimeout(() => {
+        navigationTimersRef.current.delete(timer);
+        if (!signal?.aborted) navigateAuthWindow(authWindow, url);
       }, LOGOUT_HOP_MS * (index + 1));
+      navigationTimersRef.current.add(timer);
     });
     return true;
   };
 
   const watchLoginResult = () => {
-    setAwaitingLogin(true);
+    awaitingLoginRef.current = true;
     clearWarningTimer();
     warningTimerRef.current = window.setTimeout(() => {
-      setAwaitingLogin((waiting) => {
-        if (waiting) {
-          message.warning({
-            content: "仍未连接校园网，请重新登录",
-            key: "campus-login",
-            duration: 6,
-          });
-        }
-        return waiting;
-      });
+      if (awaitingLoginRef.current) {
+        message.warning({
+          content: "仍未连接校园网，请重新登录",
+          key: "campus-login",
+          duration: 6,
+        });
+      }
     }, LOGIN_WAIT_WARNING_MS);
   };
 
@@ -199,7 +238,7 @@ function ActionButtons({ data }) {
     watchLoginResult();
   };
 
-  const startLoginHop = (authWindow, loginUrl) => {
+  const startLoginHop = (authWindow, loginUrl, signal) => {
     message.loading({
       content: "正在打开登录页…",
       key: "campus-login",
@@ -208,7 +247,7 @@ function ActionButtons({ data }) {
 
     // 先顶层访问自助服务注销接口，清掉会短路网关登录的旧会话。
     // 若本来就没有自助服务会话，这里可能返回 500，随后会立刻跳走，用户不会停在错误页。
-    if (!hopAuthWindow(authWindow, [SELF_LOGOUT_URL, loginUrl])) {
+    if (!hopAuthWindow(authWindow, [SELF_LOGOUT_URL, loginUrl], signal)) {
       showPopupBlocked(loginUrl);
       return;
     }
@@ -217,6 +256,7 @@ function ActionButtons({ data }) {
   };
 
   const startCampusLogin = () => {
+    const controller = beginOperation();
     // 必须在点击事件里先打开窗口，后续异步跳转才不容易被拦截
     const authWindow = openAuthWindow("正在准备校园网登录", "请不要关闭此窗口");
     if (!authWindow) {
@@ -235,21 +275,23 @@ function ActionButtons({ data }) {
 
     const ip = data?.v4ip || data?.v46ip;
     if (ip) {
-      startLoginHop(authWindow, buildLoginUrl(ip));
+      startLoginHop(authWindow, buildLoginUrl(ip), controller.signal);
       return;
     }
 
-    fetchDrcomStatus()
+    fetchDrcomStatus({ signal: controller.signal })
       .then((parsedData) => {
+        if (controller.signal.aborted) return;
         const resolvedIp = parsedData.v4ip || parsedData.v46ip;
         if (!resolvedIp) {
           message.error("获取IP失败: 未连接校园网或代理服务器有问题");
           authWindow.close();
           return;
         }
-        startLoginHop(authWindow, buildLoginUrl(resolvedIp));
+        startLoginHop(authWindow, buildLoginUrl(resolvedIp), controller.signal);
       })
       .catch((err) => {
+        if (controller.signal.aborted) return;
         message.error("获取IP失败: 未连接校园网或代理服务器有问题");
         console.error("获取IP失败: ", err);
         authWindow.close();
@@ -257,13 +299,7 @@ function ActionButtons({ data }) {
   };
 
   const showLogoutFailedPage = (authWindow) => {
-    try {
-      authWindow?.close();
-    } catch {
-      // 跨域窗口 close 一般可用；失败时用同名窗口覆盖
-    }
-    const promptWindow = window.open(LOGOUT_FAILED_URL, AUTH_WINDOW_NAME);
-    if (!promptWindow || promptWindow.closed || typeof promptWindow.closed === "undefined") {
+    if (!authWindow || !navigateAuthWindow(authWindow, LOGOUT_FAILED_URL)) {
       showPopupBlocked(LOGOUT_FAILED_URL);
     }
   };
@@ -295,6 +331,7 @@ function ActionButtons({ data }) {
   };
 
   const handleLogout = () => {
+    const controller = beginOperation();
     const authWindow = openAuthWindow("正在注销校园网", "请不要关闭此窗口");
     if (!authWindow) {
       showPopupBlocked(SELF_LOGOUT_URL);
@@ -308,7 +345,8 @@ function ActionButtons({ data }) {
 
     message.loading({ content: "正在注销…", key: "campus-logout", duration: 2 });
 
-    waitUntilLoggedOut().then((loggedOut) => {
+    waitUntilLoggedOut({ signal: controller.signal }).then((loggedOut) => {
+      if (controller.signal.aborted) return;
       if (!loggedOut) {
         showLogoutFailedPage(authWindow);
         return;
@@ -320,8 +358,9 @@ function ActionButtons({ data }) {
         return;
       }
 
-      fetchDrcomStatus()
+      fetchDrcomStatus({ signal: controller.signal })
         .then((parsedData) => {
+          if (controller.signal.aborted) return;
           const resolvedIp = parsedData.v4ip || parsedData.v46ip;
           if (!resolvedIp) {
             showPopupBlocked(SELF_SSO_URL);
@@ -330,17 +369,21 @@ function ActionButtons({ data }) {
           openLoginPage(authWindow, buildLoginUrl(resolvedIp));
         })
         .catch(() => {
-          startCampusLogin();
+          if (controller.signal.aborted) return;
+          message.error("无法获取本机 IP，请在自助服务页面重新登录");
+          if (!navigateAuthWindow(authWindow, SELF_SSO_URL)) {
+            showPopupBlocked(SELF_SSO_URL);
+          }
         });
     });
   };
 
   const handlePay = () => {
     Modal.confirm({
-      title: "校区确认",
+      title: "注意",
       content: (
         <div>
-          充值网费时请注意选择开发区校区！
+          充值网费时需选择“开发区校区”！
         </div>
       ),
       okText: "确定",
