@@ -55,7 +55,10 @@ fi
 # 提权后仍然针对原始桌面用户修改代理设置，而不是误操作 root 的配置。
 TARGET_USER="${NETWORK_RESET_USER:-${SUDO_USER:-root}}"
 TARGET_HOME="${NETWORK_RESET_HOME:-$(getent passwd "$TARGET_USER" | cut -d: -f6)}"
-
+if [ -z "$TARGET_HOME" ] || [ ! -d "$TARGET_HOME" ]; then
+    echo -e "${RED}错误：无法确定用户 $TARGET_USER 的 HOME 目录${NC}"
+    exit 1
+fi
 # =================================================================
 # 检测网络管理工具
 # =================================================================
