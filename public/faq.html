@@ -88,7 +88,7 @@
 -->
   <main>
     <h2>校园网常见问题</h2>
-    <p style="text-align:center; font-size:0.9em; color:#666; margin-top:0.2em;"> 本页面内容由大连理工大学 NAOSI 网络与开源协会维护，若遇到未在本页列出的问题，请联系<strong>开发区校区网络服务办公室</strong>解决。 </p>
+    <p style="text-align:left; font-size:0.9em; color:#666; margin-top:0.2em;"> 本页内容由大连理工大学 NAOSI 网络与开源协会维护，若遇到未在本页列出的问题，请联系<strong>开发区校区网络服务办公室</strong>解决。 </p>
     <hr>
     <p><strong>Q1:</strong> 已经登录校园网账号，但仍无法连接网络，“用户自助服务系统”中未显示当前设备在线信息，怎么办？</p>
     <img src="./faq_assets/faq1.jpg" alt="FAQ1">
@@ -102,7 +102,7 @@
     </ol>
     <hr>
     <p><strong>Q2:</strong> “用户自助服务系统”里账户余额明明不是 0 元，为什么无法上网？</p>
-    <p><strong>A2:</strong> 不要看账户余额，看可用流量还剩多少，如果还剩 0M 那就是当月流量已耗尽。想继续用只能再充钱（超出部分 1 元 1GB，充钱后流量自动入账，到下个自然月重置）。</p>
+    <p><strong>A2:</strong> 不要看账户余额，看可用流量还剩多少，如果还剩 0M 那就是当月流量已耗尽。想继续用只能接着充钱（超出部分 1 元 1GB，充钱后流量自动入账，到下个自然月重置）。</p>
     <hr>
     <p><strong>Q3:</strong> “用户自助服务系统”里可用流量明明不是 0M，为什么仍然无法上网？</p>
     <p><strong>A3:</strong> 此时账号状态为临停，原因是账户余额不足（为 0 元）。如果充钱之后又出现了无法上网的问题，是因为当前计费方式不是按月计费。</p>
@@ -115,7 +115,7 @@
     </ol>
     <hr>
     <p><strong>Q4:</strong> 为什么插上网线之后我的电脑就断网了？</p>
-    <p><strong>A4:</strong> 连接网线后设备 MAC 地址发生变化，断网是正常现象，重新登录校园网即可。</p>
+    <p><strong>A4:</strong> 连接网线后设备 MAC 地址发生变化，断网是正常现象，重新登录校园网即可。（如果无论如何都登录不了有线校园网，可能是网口有问题，请联系校区网络服务办公室来检修）</p>
     <hr>
     <p><strong>Q5:</strong> 连接了校园网但是访问不了网页，浏览器提示如图所示（错误代码通常为 ERR_PROXY_CONNECTION_FAILED），怎么办？</p>
     <img src="./faq_assets/proxy1.jpg" alt="代理提示示例1" style="max-width:40%;height:auto;margin-right:1rem;">
@@ -129,15 +129,18 @@
     <p>如果您无法理解上述教程，可使用脚本进行处理：<a href="http://172.20.30.3/network_reset.bat" download>Windows</a> <a href="http://172.20.30.3/network_reset.sh" download>macOS</a> <a href="http://172.20.30.3/network_reset_linux.sh" download>Linux</a></p>
     <hr>
     <p><strong>Q7:</strong> 在人员密集区域（如教学楼 C-101 教室）为什么连不上校园网？</p>
-    <p><strong>A7:</strong> 当前区域的无线 AP 所能分配的 IP 地址已达上限，除非增加硬件，否则没有解决办法，等人少了就好了。</p>
+    <p><strong>A7:</strong> 当前区域的校园网无线 AP 所能分配的 IP 地址已达上限，唯一解决办法是由维护人员增加设备数量。当下只能等教室里人少了之后才能恢复正常。</p>
     <hr>
     <p><strong>Q8:</strong> 网费充错校区了怎么办？</p>
-    <p><strong>A8:</strong> 请拨打电话 <a href="tel:0411-84707007">0411-84707007</a> 咨询，下次充网费记得看清楚再充。</p>
+    <p><strong>A8:</strong> 请拨打电话 <a href="tel:0411-84707007">0411-84707007</a> 咨询退费事宜，下次充网费记得看清楚再充。</p>
     <hr>
-    <p><strong>Q9:</strong> i大工账号/校园邮箱账户/图书馆账户有问题登不上去，该向谁反映问题？</p>
-    <p><strong>A9:</strong> 开发区校区网络服务办公室仅负责校区网络维护。涉及到大工公共网络资源的，请直接联系大连理工大学网络与信息化中心（办公地点在凌水校区，联系电话 <a href="tel:0411-84707014">0411-84707014</a>，联系邮箱 <a href="mailto:its@dlut.edu.cn">its@dlut.edu.cn</a>）。</p>
+    <p><strong>Q9:</strong> i大工账号/校园邮箱账户/图书馆账户出问题了登不上去了，该找谁？</p>
+    <p><strong>A9:</strong> 开发区校区网络服务办公室仅负责校区网络维护。涉及到大工全校的公共网络资源的，请直接联系大连理工大学网络与信息化中心（办公地点在凌水校区，联系电话 <a href="tel:0411-84707014">0411-84707014</a>，联系邮箱 <a href="mailto:its@dlut.edu.cn">its@dlut.edu.cn</a>）。</p>
+    <hr>
+    <p><strong>Q10:</strong> 校园网网速好慢，正常吗？怎么处理？</p>
+    <p><strong>A10:</strong> 如果你连接的是无线网络，无线网络受各种因素影响，网速和稳定性等都不会太好，出现网速慢、网络波动等都属于正常现象。如果你连接的是有线网络，校园网在有线连接下理论最高网速可达千兆，一般情况下网速在 500M 以上是正常的，如果你的网速只有不到 300M，请考虑联系校区网络服务办公室进行检修。</p>
   </main>
-  <footer> &copy; 大连理工大学开发区校区校园网 FAQ </footer>
+  <footer> &copy; NAOSI </footer>
 </body>
 
 </html>
