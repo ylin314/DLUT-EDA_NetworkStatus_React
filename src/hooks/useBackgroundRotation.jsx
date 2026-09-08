@@ -22,21 +22,25 @@ export function useBackgroundRotation() {
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
 
     const loadAndApply = async () => {
-      let images = [];
+      let list;
 
       try {
-        const response = await fetch(BACKGROUND_INDEX_URL, { cache: 'no-store' });
+        const response = await fetch(BACKGROUND_INDEX_URL, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
         if (!response.ok) return;
 
-        const list = await response.json();
+        list = await response.json();
         if (!Array.isArray(list)) return;
-
-        images = list.filter((item) => typeof item === 'string' && item.length > 0);
       } catch {
         return;
       }
+
+      const images = list.filter((item) => typeof item === 'string' && item.length > 0);
 
       if (cancelled || images.length === 0) return;
 
@@ -97,6 +101,7 @@ export function useBackgroundRotation() {
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, []);
 
