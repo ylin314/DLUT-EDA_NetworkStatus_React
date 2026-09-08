@@ -9,71 +9,37 @@ import {
 
 const AUTH_WINDOW_NAME = "dlutCampusAuth";
 const SELF_SSO_URL = buildSelfServiceUrl();
-const LOGOUT_FAILED_URL = `${import.meta.env.BASE_URL}logout-failed.html`;
 const LOGOUT_HOP_MS = 600;
 const LOGIN_WAIT_WARNING_MS = 25000;
+const LOGOUT_FAILED_URL = `${import.meta.env.BASE_URL}logout-failed.html`;
 const LOGOUT_CHECK_TIMEOUT_MS = 2500;
 const LOGOUT_CHECK_INTERVAL_MS = 400;
 
-function waitUntilLoggedOut({
-  signal,
-  timeoutMs = LOGOUT_CHECK_TIMEOUT_MS,
-  intervalMs = LOGOUT_CHECK_INTERVAL_MS,
-} = {}) {
+function waitUntilLoggedOut(timeoutMs = LOGOUT_CHECK_TIMEOUT_MS, intervalMs = LOGOUT_CHECK_INTERVAL_MS) {
   const startedAt = Date.now();
   return new Promise((resolve) => {
-    let settled = false;
-    let timer = null;
-
-    const finish = (result) => {
-      if (settled) return;
-      settled = true;
-      if (timer) window.clearTimeout(timer);
-      signal?.removeEventListener("abort", handleAbort);
-      resolve(result);
-    };
-
-    const handleAbort = () => finish(false);
-
     const tick = () => {
-      if (signal?.aborted) {
-        finish(false);
-        return;
-      }
-
-      const remainingMs = timeoutMs - (Date.now() - startedAt);
-      if (remainingMs <= 0) {
-        finish(false);
-        return;
-      }
-
-      fetchDrcomStatus({ signal, timeoutMs: Math.min(1000, remainingMs) })
+      fetchDrcomStatus()
         .then((payload) => {
           if (payload.result !== 1) {
-            finish(true);
+            resolve(true);
             return;
           }
           if (Date.now() - startedAt >= timeoutMs) {
-            finish(false);
+            resolve(false);
             return;
           }
-          timer = window.setTimeout(tick, intervalMs);
+          window.setTimeout(tick, intervalMs);
         })
         .catch(() => {
-          if (signal?.aborted) {
-            finish(false);
-            return;
-          }
           if (Date.now() - startedAt >= timeoutMs) {
-            finish(false);
+            resolve(false);
             return;
           }
-          timer = window.setTimeout(tick, intervalMs);
+          window.setTimeout(tick, intervalMs);
         });
     };
-
-    signal?.addEventListener("abort", handleAbort, { once: true });
-    timer = window.setTimeout(tick, intervalMs);
+    window.setTimeout(tick, intervalMs);
   });
 }
 
@@ -299,7 +265,13 @@ function ActionButtons({ data }) {
   };
 
   const showLogoutFailedPage = (authWindow) => {
-    if (!authWindow || !navigateAuthWindow(authWindow, LOGOUT_FAILED_URL)) {
+    try {
+      authWindow?.close();
+    } catch {
+      // 跨域窗口 close 一般可用；失败时用同名窗口覆盖
+    }
+    const promptWindow = window.open(LOGOUT_FAILED_URL, AUTH_WINDOW_NAME);
+    if (!promptWindow || promptWindow.closed || typeof promptWindow.closed === "undefined") {
       showPopupBlocked(LOGOUT_FAILED_URL);
     }
   };
@@ -331,7 +303,6 @@ function ActionButtons({ data }) {
   };
 
   const handleLogout = () => {
-    const controller = beginOperation();
     const authWindow = openAuthWindow("正在注销校园网", "请不要关闭此窗口");
     if (!authWindow) {
       showPopupBlocked(SELF_LOGOUT_URL);
@@ -345,8 +316,7 @@ function ActionButtons({ data }) {
 
     message.loading({ content: "正在注销…", key: "campus-logout", duration: 2 });
 
-    waitUntilLoggedOut({ signal: controller.signal }).then((loggedOut) => {
-      if (controller.signal.aborted) return;
+    waitUntilLoggedOut().then((loggedOut) => {
       if (!loggedOut) {
         showLogoutFailedPage(authWindow);
         return;
@@ -358,9 +328,8 @@ function ActionButtons({ data }) {
         return;
       }
 
-      fetchDrcomStatus({ signal: controller.signal })
+      fetchDrcomStatus()
         .then((parsedData) => {
-          if (controller.signal.aborted) return;
           const resolvedIp = parsedData.v4ip || parsedData.v46ip;
           if (!resolvedIp) {
             showPopupBlocked(SELF_SSO_URL);
@@ -369,11 +338,7 @@ function ActionButtons({ data }) {
           openLoginPage(authWindow, buildLoginUrl(resolvedIp));
         })
         .catch(() => {
-          if (controller.signal.aborted) return;
-          message.error("无法获取本机 IP，请在自助服务页面重新登录");
-          if (!navigateAuthWindow(authWindow, SELF_SSO_URL)) {
-            showPopupBlocked(SELF_SSO_URL);
-          }
+          startCampusLogin();
         });
     });
   };
